@@ -433,6 +433,7 @@ function attackMain () {
   if (!attack()) errAttack++;
   sleep(10000);
   if (errAttack > 4) {
+    toast('战斗结束');
     return false;
   }
   return true;
