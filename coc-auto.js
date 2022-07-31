@@ -190,7 +190,7 @@ function helps (arr1, arr2, j) {
     myClick(p.x + 10, p.y)
     p = colorM(arr1, arr2)
     ++i
-  }  
+  }
   if (!isInPicture(0.8, donateReturn, findQuckBtn) && i === 0 && j < 6) {
     toast('居然没设置工程车!!!')
     leftRow()
@@ -439,8 +439,7 @@ function attacking () {
   gap = null
 }
 
-function attackMain () {
-  clickAndSleep(attackPoints.chatOn[0], attackPoints.chatOn[1])
+function closeAd () {
   let j = 0
   while (!inCoc()) {
     sleep(5000)
@@ -453,6 +452,12 @@ function attackMain () {
     j++
     if (j > 12) return false
   }
+  return true
+}
+
+function attackMain () {
+  clickAndSleep(attackPoints.chatOn[0], attackPoints.chatOn[1])
+  if (!closeAd()) return false
   clickAndSleep(attackPoints.chatOff[0], attackPoints.chatOff[1], '关闭聊天')
   if (!attack()) errAttack++
   sleep(10000)
@@ -494,6 +499,7 @@ function main () {
     clickAndSleep(points.errorClick[2][0], points.errorClick[2][1], '关闭捐赠界面')
     if (isAttack) {
       toast('attack!!!')
+      closeAd()
       if (!attackMain()) isAttack = false
     } else if (currentTime() > 180 && currentTime() < 290) {
       toast('攻击时间到！！！')
@@ -501,6 +507,7 @@ function main () {
       errAttack = 0
     }
     if (time + 20 < currentTime() && !inCoc()) {
+      closeAd()
       sleep(1000)
       let i = 0
       while (!inCoc()) {
