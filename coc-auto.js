@@ -191,7 +191,7 @@ function helps (arr1, arr2, j) {
     p = colorM(arr1, arr2)
     ++i
   }
-  if (!isInPicture(0.8, donateReturn, findQuckBtn) && i === 0 && j < 6) {
+  if (isInPicture(0.8, donateReturn, findQuckBtn) && i === 0 && j < 2) {
     toast('居然没设置工程车!!!')
     leftRow()
     helps(arr1, arr2, ++j)
