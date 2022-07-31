@@ -21,7 +21,7 @@ appName = "部落冲突",
       [993, 431],
     ], //友谊战
     donateRange: [[538, 30, 646, 482], ["#75AF15", 10, 25]],
-    errorClick: [[1235, 49], [530, 319], [1270, 200]],
+  errorClick: [[1235, 49], [530, 319], [1270, 200], [615, 643]],
   MacPoint: [1140, 204, 620, 204]
   },
   attackPoints = {
@@ -34,7 +34,7 @@ appName = "部落冲突",
       [[310, 677, 6, 6], ["#D7F37F", 4, 80]],
       [993, 431],
     ], //友谊战
-    errorClick: [[1235, 49], [530, 319], [1270, 200]],
+  errorClick: [[1235, 49], [530, 319], [1270, 200], [615, 643]],
     //军队
     armyRecruit: [50, 526], //招募军队
     armyOut: [[1181, 45, 5, 5], ["#ED1515", 2, 40]],
@@ -61,12 +61,12 @@ appName = "部落冲突",
     ], //一键恢复英雄
     attack: [
       [76, 625],
-      [[960, 473, 6, 6], ["#CC5B17", 3, 50]],
+      [[960, 473, 6, 6], ["#CC5B17", 3, 50], [975, 500]],
     ], //发起
     attacking: [
       [1149, 269],//军队坐标
       [954, 243],//药水坐标
-      [[61, 550, 5, 5], ["#FB5D63", 3, 50]]
+      [[61, 550, 5, 5], ["#FB5D63", 3, 65]]
     ], //军队和药水初始放置地点
     troopsTab: [
       [195, 630],
@@ -77,7 +77,8 @@ appName = "部落冲突",
       [700, 630],
       [800, 630],
       [297, 630],
-    ],
+  ],
+  backPoint: [505, 143],
     attackBack: [[615, 643, 3, 3], ["#6DBB1F", 3, 35]],
 }
 
@@ -189,8 +190,8 @@ function helps (arr1, arr2, j) {
     myClick(p.x + 10, p.y)
     p = colorM(arr1, arr2)
     ++i
-  }
-  if (i === 0, j < 20) {
+  }  
+  if (!isInPicture(0.8, donateReturn, findQuckBtn) && i === 0 && j < 6) {
     toast('居然没设置工程车!!!')
     leftRow()
     helps(arr1, arr2, ++j)
@@ -385,14 +386,19 @@ function attack () {
     return false
   }
   clickAndSleep(arr[1][0][0], arr[1][0][1], "匹配")
-  clickAndSleep(arr[1][0][0], arr[1][0][1], "匹配")
+  clickAndSleep(arr[1][2][0], arr[1][2][1], "匹配")
   arr = null
   const time = new Date().getTime()
   while (time + 100000 >= new Date()) {
     if (colorM(attackPoints.attacking[2][0], attackPoints.attacking[2][1])) break
-    toast('终于能打了')
   }
-  if (time + 100000 < new Date()) return
+  toast('终于能打了')
+  if (time + 100000 < new Date()) {
+    sleep(195000 - 100000)
+    myClick(attackPoints.attackBack[0][0], attackPoints.attackBack[0][1])
+    time = null
+    return
+  }
   time = null
   attacking()
   return true
@@ -488,9 +494,8 @@ function main () {
     clickAndSleep(points.errorClick[2][0], points.errorClick[2][1], '关闭捐赠界面')
     if (isAttack) {
       toast('attack!!!')
-      clickAndSleep(points.chatOff[0], points.chatOff[1], '关闭聊天')
       if (!attackMain()) isAttack = false
-    } else if (currentTime() > 521 && currentTime() < 630) {
+    } else if (currentTime() > 180 && currentTime() < 290) {
       toast('攻击时间到！！！')
       isAttack = true
       errAttack = 0
