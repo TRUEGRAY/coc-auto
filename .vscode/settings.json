@@ -1,4 +1,7 @@
 {
   "javascript.preferences.quoteStyle": "single",
-  "javascript.format.semicolons": "remove"
+  "javascript.format.semicolons": "remove",
+  "javascript.referencesCodeLens.showOnAllFunctions": true,
+  "javascript.referencesCodeLens.enabled": true,
+  "diffEditor.codeLens": true
 }

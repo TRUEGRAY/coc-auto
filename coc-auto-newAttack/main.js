@@ -20,9 +20,9 @@ appName = "部落冲突",
       [[310, 677, 6, 6], ["#D7F37F", 4, 80]],
       [993, 431],
     ], //友谊战
-  donateRange: [[538, 30, 646, 482], ["#75AF15", 8, 30]],
-  errorClick: [[1235, 49], [530, 319], [1270, 200], [615, 643]],
-  MacPoint: [1170, 225, 546, 225]
+    donateRange: [[538, 30, 646, 482], ["#75AF15", 10, 25]],
+    errorClick: [[1235, 49], [530, 319], [1270, 200], [615, 643]],
+    MacPoint: [1140, 204, 620, 204]
   },
   attackPoints = {
     //此为位置点
@@ -34,7 +34,7 @@ appName = "部落冲突",
       [[310, 677, 6, 6], ["#D7F37F", 4, 80]],
       [993, 431],
     ], //友谊战
-  errorClick: [[1235, 49], [530, 319], [1270, 200], [615, 643]],
+    errorClick: [[1235, 49], [530, 319], [1270, 200], [615, 643]],
     //军队
     armyRecruit: [50, 526], //招募军队
     armyOut: [[1181, 45, 5, 5], ["#ED1515", 2, 40]],
@@ -54,8 +54,8 @@ appName = "部落冲突",
       [634, 468],
     ], //1发起2确认
     quckHeroes: [
-      [876, 401],
-      [970, 401],
+      [863, 401],
+      [976, 401],
       [1066, 401],
       [1161, 401],
     ], //一键恢复英雄
@@ -77,14 +77,13 @@ appName = "部落冲突",
       [700, 630],
       [800, 630],
       [297, 630],
-  ],
-  backPoint: [505, 143],
+    ],
+    backPoint: [505, 143],
     attackBack: [[615, 643, 3, 3], ["#6DBB1F", 3, 35]],
-}
+  }
 
-let isAttack = false,
-  errAttack = 0,
-  clickP = null
+let isAttack = true,
+  donate, errAttack = 0
 
 function myClick (x, y) {
   const ra = new RootAutomator()
@@ -92,14 +91,9 @@ function myClick (x, y) {
   ra.exit()
 }
 
-function mySwipe (arr) {
-  const ra = new RootAutomator()
-  ra.swipe(720 - arr[1], arr[0], 720 - arr[3], arr[2], [100])
-  ra.exit()
-}
-
 function myStop () {
   points = null
+  console.log("---------此脚本结束运行----------")
   engines.myEngine().forceStop()
 }
 
@@ -122,35 +116,29 @@ function close_and_recycle (packageName) {
     const isConfirm = textMatches(/(.*确.*|.*定.*)/).findOne()
     if (isConfirm) isConfirm.click()
     toast("强行停止")
+    log(app.getAppName(name) + "应用已被关闭")
     name = null
-  } else {
-    errorAndRestart()
   }
 }
 
 function clickAndSleep (x, y, msg) {
   myClick(x, y)
   sleep(1000)
+  console.log(msg + new Date().toTimeString())
 }
 
-function isInPicture (march, mode, r, isClick) {
+function isInPicture (march, mode, r) {
   const region = [r[0], r[1], r[2], r[3]]
-  const screen = captureScreen().clone()
-  let p = findImage(screen, mode, {
+  let p = findImage(captureScreen(), mode, {
     threshold: march,
     region: region
   })
   region = null
-  mode = null
-  screen.recycle()
-  if (p) {
-    if (isClick) clickP = new Object({ x: p.x, y: p.y })
-    p = null
-    return true
-  }
+  if (p) return p
   else return false
 }
-function colorM (arr1, arr2, isClick) {
+
+function colorM (arr1, arr2) {
   point = [arr1[0], arr1[1], arr1[2], arr1[3]]
   color = arr2[0]
   r = arr2[1]
@@ -162,84 +150,13 @@ function colorM (arr1, arr2, isClick) {
       if (i !== j) findColorMethod.push(new Array(j, i, color))
     }
   }
-  const screen = captureScreen().clone()
-  let p = images.findMultiColors(screen, color, findColorMethod, {
+  let p = images.findMultiColors(captureScreen(), color, findColorMethod, {
     region: point,
     threshold: m,
   })
-  screen.recycle()
   findColorMethod = null
-  if (p) {
-    if (isClick) clickP = new Object({ x: p.x + 10, y: p.y })
-    p = null
-    return true
-  }
+  if (p) return p
   else return false
-}
-
-function leftRow () {
-  mySwipe(points.MacPoint)
-}
-
-function helps (arr1, arr2, j) {
-  colorM(arr1, arr2, true)
-  const donateReturn = initPictureStart(quckBtnRegion, donateReturnPath)
-  sleep(1000)
-  let i = 0
-  while (colorM(arr1, arr2, true) && i < 25) {
-    if (!isInPicture(0.8, donateReturn, findQuckBtn)) break
-    myClick(clickP.x, clickP.y)
-    ++i
-  }
-  if (isInPicture(0.8, donateReturn, findQuckBtn) && i === 0 && j < 2) {
-    toast('居然没设置工程车!!!')
-    leftRow()
-    helps(arr1, arr2, ++j)
-  }
-  donateReturn = null
-  donateReturn.recycle()
-  p = null
-  return i
-}
-
-function doHelp (i, j) {
-  const donate = initPictureStart(donateRegion, donatePath)
-  let p = isInPicture(0.9, donate, findPictureRegion, true)
-  donate.recycle()
-  if (p) {
-    clickAndSleep(clickP.x, clickP.y, "点击捐兵按钮")
-    const quckDonate = initPictureStart(quckBtnRegion, quckBtnPath)
-    let pp = isInPicture(0.7, quckDonate, findQuckBtn, true)
-    quckDonate.recycle()
-    if (pp) {
-      myClick(clickP.x, clickP.y)
-      const ijjjjj = helps(points.donateRange[0], points.donateRange[1], 0)
-      if (ijjjjj > 30) return false
-    }
-  } else {
-    while (
-      i === 0 &&
-      colorM(points.chatUp[0], points.chatUp[1])
-    ) {
-      myClick(points.chatUp[0][0], points.chatUp[0][1])
-      sleep(1000)
-    }
-    if (
-      i === 1 &&
-      colorM(points.chatDown[0], points.chatDown[1])
-    ) {
-      myClick(points.chatDown[0][0], points.chatDown[0][1])
-      doHelp(1, j)
-    } else if (i === 0) {
-      doHelp(1, j)
-    }
-    if (j <= 4) doHelp(2, ++j)
-    else {
-      p = null
-      pp = null
-      return false
-    }
-  }
 }
 
 function currentTime () {
@@ -249,27 +166,17 @@ function currentTime () {
   return res
 }
 
-function isBreak () {
-  const curT = currentTime()
-  for (let i = 0; i < breakTimeArr.length; i++) {
-    if (curT >= breakTimeArr[i] && breakTimeArr[i] + 10 > curT) return true
-  }
-  return false
-}
-
 function save (x, y, w, h, p) {
   x = x
   y = y
   w = w
   h = h
-  const screen = captureScreen().clone()
-  const target = images.clip(screen, x, y, w, h)
+  const target = images.clip(captureScreen(), x, y, w, h)
   images.save(
     target,
     p
   )
   target.recycle()
-  screen.recycle()
 }
 
 function inCoc () {
@@ -292,17 +199,11 @@ function checkError () {
 
 function initPictureStart (a, p) {
   if (!files.isFile(p)) {
+    console.log('需要截图保存')
     if (!files.isDir("./cocPicture/")) files.create("./cocPicture/")
     save(a[0], a[1], a[2], a[3], p)
   }
   return images.read(p)
-}
-
-function errorAndRestart () {
-  close_and_recycle(appName)
-  sleep(100000)
-  launchApp(appName)
-  main()
 }
 
 function openAddAndCheck () {
@@ -381,6 +282,7 @@ function attack () {
   if (!prepare()) return false
   const arr = attackPoints.attack
   clickAndSleep(arr[0][0], arr[0][1], "打开攻击")
+  sleep(3000)
   if (!colorM(arr[1][0], arr[1][1])) {
     checkError()
     toast('识别错误！！！')
@@ -398,14 +300,10 @@ function attack () {
       else time2 = new Date().getTime()
     }
   }
+  if (time + 100000 < new Date()) return false
   toast('终于能打了')
-  if (time + 100000 < new Date()) {
-    sleep(195000 - 100000)
-    myClick(attackPoints.attackBack[0][0], attackPoints.attackBack[0][1])
-    time = null
-    return
-  }
   time = null
+  time2 = null
   attacking()
   return true
 }
@@ -425,22 +323,19 @@ function clickCountSpells (p, count, i) {
 
 function attacking () {
   toast('正在攻击！！！')
-  const time = new Date().getTime() + 180000
   const arr = attackPoints.troopsTab
   for (let index = 0; index < arr.length; index++) {
     clickAndSleep(arr[index][0], arr[index][1])
-    if (index === 0) clickCountTroops(attackPoints.attacking[0], 15)
+    if (index === 0) clickCountTroops(attackPoints.attacking[0], 8)
     else if (index === 3) {
       clickCountSpells(attackPoints.attacking[1], 2, 0)
       sleep(2000)
     } else if (index === 6) clickCountSpells(attackPoints.attacking[1], 5, 2)
     else clickAndSleep(attackPoints.attacking[0][0], attackPoints.attacking[0][1])
   }
-  attackWait(time)
-  sleep(10000)
   arr = null
-  time = null
-  gap = null
+  sleep(6000)
+  errorAndRestart(appName)
 }
 
 function closeAd () {
@@ -472,32 +367,22 @@ function attackMain () {
   return true
 }
 
-function attackWait (t) {
-  clickAndSleep(attackPoints.attackBack[0][0], attackPoints.attackBack[0][1])
-  clickAndSleep(points.chatOn[0], points.chatOn[1], '打开聊天')
-  while (!inCoc()) {
-    if (new Date().getTime() > t) {
-      closeAd()
-      sleep(4000)
-      break
-    }
-    clickAndSleep(attackPoints.attackBack[0][0], attackPoints.attackBack[0][1])
-    sleep(3000)
-    toast('等待ing')
-    clickAndSleep(points.chatOn[0], points.chatOn[1], '打开聊天')
-  }
+function errorAndRestart () {
+  close_and_recycle(appName)
+  sleep(5000)
+  launchApp(appName)
+  main()
 }
 
 function waitStart () {
-  clickAndSleep(points.chatOn[0], points.chatOn[1], '打开聊天')
-  const time = new Date().getTime() + 300000
+  const time = new Date().getTime()
   while (true) {
     let i = 0
     while (!inCoc()) {
-      if (time < new Date().getTime()) return false
+      if (time + 300000 < new Date().getTime()) return false
       i++
       if (i < 8) {
-        sleep(50000 + i * 10000)
+        sleep(30000)
       } else {
         return false
       }
@@ -509,32 +394,28 @@ function waitStart () {
 
 function main () {
   let isb = true
-  if (!waitStart()) errorAndRestart()
+  clickAndSleep(points.chatOn[0], points.chatOn[1], '打开聊天')
+  donate = initPictureStart(donateRegion, donatePath)
+  if (!waitStart()) errorAndRestart(appName)
   let time = currentTime()
+  let notAttack = 0
   while (isb) {
     myClick(points.chatOn[0], points.chatOn[1])
     sleep(1000)
-    while (true) {
-      if (!doHelp(0, 0)) break
-    }
-    sleep(1000)
-    clickAndSleep(points.errorClick[2][0], points.errorClick[2][1], '关闭捐赠界面')
     if (isAttack) {
       toast('attack!!!')
-      if (!attackMain()) isAttack = false
-    } else if (currentTime() > 180 && currentTime() < 290) {
-      toast('攻击时间到！！！')
-      isAttack = true
-      errAttack = 0
+      if (!attackMain()) notAttack++
+      if (notAttack > 10) isb = false
     }
     if ((time + 2 < currentTime() && !inCoc()) || (isAttack && !inCoc())) {
+      closeAd()
       sleep(1000)
       let i = 0
       while (!inCoc()) {
         while (i < 8) {
           errorAndRestart()
+          sleep(1000 * i * i)
           i++
-          sleep(1000 * i + i)
         }
         isb = false
         break
@@ -542,6 +423,8 @@ function main () {
       time = currentTime()
     }
   }
+  donate = null
+  time = null
   errorAndRestart()
 }
 images.requestScreenCapture(true)
